@@ -94,7 +94,8 @@ class SocialMediaScreen extends StatelessWidget {
               ),
             ),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -125,7 +126,8 @@ class SocialMediaScreen extends StatelessWidget {
                         : (theme.brightness == Brightness.dark
                             ? Colors.grey.shade400
                             : Colors.grey.shade600),
-                    decoration: hasUrl ? TextDecoration.underline : TextDecoration.none,
+                    decoration:
+                        hasUrl ? TextDecoration.underline : TextDecoration.none,
                   ),
                 ),
               ),

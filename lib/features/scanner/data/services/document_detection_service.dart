@@ -27,7 +27,8 @@ class DocumentDetectionService {
       final srcH = sourceImage.height;
 
       if (srcW < 50 || srcH < 50) {
-        return DocumentDetectionResult(corners: defaultCorners, isHighConfidence: false);
+        return DocumentDetectionResult(
+            corners: defaultCorners, isHighConfidence: false);
       }
 
       // Downscale to max 350px for fast analysis
@@ -35,14 +36,16 @@ class DocumentDetectionService {
       final targetW = (srcW * scale).round().clamp(50, 350);
       final targetH = (srcH * scale).round().clamp(50, 350);
 
-      final smallImage = img.copyResize(sourceImage, width: targetW, height: targetH);
+      final smallImage =
+          img.copyResize(sourceImage, width: targetW, height: targetH);
 
       // Convert to grayscale grid
       final gray = List<int>.filled(targetW * targetH, 0);
       for (int y = 0; y < targetH; y++) {
         for (int x = 0; x < targetW; x++) {
           final p = smallImage.getPixel(x, y);
-          gray[y * targetW + x] = (0.299 * p.r + 0.587 * p.g + 0.114 * p.b).round();
+          gray[y * targetW + x] =
+              (0.299 * p.r + 0.587 * p.g + 0.114 * p.b).round();
         }
       }
 
@@ -51,13 +54,19 @@ class DocumentDetectionService {
       int maxGrad = 1;
       for (int y = 1; y < targetH - 1; y++) {
         for (int x = 1; x < targetW - 1; x++) {
-          final gx = (gray[y * targetW + (x + 1)] - gray[y * targetW + (x - 1)]) * 2 +
-              (gray[(y - 1) * targetW + (x + 1)] - gray[(y - 1) * targetW + (x - 1)]) +
-              (gray[(y + 1) * targetW + (x + 1)] - gray[(y + 1) * targetW + (x - 1)]);
+          final gx =
+              (gray[y * targetW + (x + 1)] - gray[y * targetW + (x - 1)]) * 2 +
+                  (gray[(y - 1) * targetW + (x + 1)] -
+                      gray[(y - 1) * targetW + (x - 1)]) +
+                  (gray[(y + 1) * targetW + (x + 1)] -
+                      gray[(y + 1) * targetW + (x - 1)]);
 
-          final gy = (gray[(y + 1) * targetW + x] - gray[(y - 1) * targetW + x]) * 2 +
-              (gray[(y + 1) * targetW + (x - 1)] - gray[(y - 1) * targetW + (x - 1)]) +
-              (gray[(y + 1) * targetW + (x + 1)] - gray[(y - 1) * targetW + (x + 1)]);
+          final gy =
+              (gray[(y + 1) * targetW + x] - gray[(y - 1) * targetW + x]) * 2 +
+                  (gray[(y + 1) * targetW + (x - 1)] -
+                      gray[(y - 1) * targetW + (x - 1)]) +
+                  (gray[(y + 1) * targetW + (x + 1)] -
+                      gray[(y - 1) * targetW + (x + 1)]);
 
           final g = (gx.abs() + gy.abs());
           grad[y * targetW + x] = g;
@@ -76,8 +85,12 @@ class DocumentDetectionService {
 
       final thresholdGrad = maxGrad * 0.18;
 
-      for (int y = (targetH * 0.05).round(); y < (targetH * 0.95).round(); y++) {
-        for (int x = (targetW * 0.05).round(); x < (targetW * 0.95).round(); x++) {
+      for (int y = (targetH * 0.05).round();
+          y < (targetH * 0.95).round();
+          y++) {
+        for (int x = (targetW * 0.05).round();
+            x < (targetW * 0.95).round();
+            x++) {
           final g = grad[y * targetW + x];
           if (g < thresholdGrad) continue;
 
@@ -113,10 +126,14 @@ class DocumentDetectionService {
       }
 
       // Check if found quad is reasonable (area >= 20% of image area and convex)
-      final normTL = Offset((tlX / targetW).clamp(0.02, 0.95), (tlY / targetH).clamp(0.02, 0.95));
-      final normTR = Offset((trX / targetW).clamp(0.05, 0.98), (trY / targetH).clamp(0.02, 0.95));
-      final normBR = Offset((brX / targetW).clamp(0.05, 0.98), (brY / targetH).clamp(0.05, 0.98));
-      final normBL = Offset((blX / targetW).clamp(0.02, 0.95), (blY / targetH).clamp(0.05, 0.98));
+      final normTL = Offset(
+          (tlX / targetW).clamp(0.02, 0.95), (tlY / targetH).clamp(0.02, 0.95));
+      final normTR = Offset(
+          (trX / targetW).clamp(0.05, 0.98), (trY / targetH).clamp(0.02, 0.95));
+      final normBR = Offset(
+          (brX / targetW).clamp(0.05, 0.98), (brY / targetH).clamp(0.05, 0.98));
+      final normBL = Offset(
+          (blX / targetW).clamp(0.02, 0.95), (blY / targetH).clamp(0.05, 0.98));
 
       final quadArea = _computeQuadArea(normTL, normTR, normBR, normBL);
 
@@ -137,8 +154,16 @@ class DocumentDetectionService {
   }
 
   static double _computeQuadArea(Offset p0, Offset p1, Offset p2, Offset p3) {
-    final area1 = 0.5 * ((p0.dx * (p1.dy - p2.dy) + p1.dx * (p2.dy - p0.dy) + p2.dx * (p0.dy - p1.dy)).abs());
-    final area2 = 0.5 * ((p0.dx * (p2.dy - p3.dy) + p2.dx * (p3.dy - p0.dy) + p3.dx * (p0.dy - p2.dy)).abs());
+    final area1 = 0.5 *
+        ((p0.dx * (p1.dy - p2.dy) +
+                p1.dx * (p2.dy - p0.dy) +
+                p2.dx * (p0.dy - p1.dy))
+            .abs());
+    final area2 = 0.5 *
+        ((p0.dx * (p2.dy - p3.dy) +
+                p2.dx * (p3.dy - p0.dy) +
+                p3.dx * (p0.dy - p2.dy))
+            .abs());
     return area1 + area2;
   }
 }

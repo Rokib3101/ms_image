@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
+import '../database/repositories/security_repository.dart';
+import '../errors/error_handler.dart';
 
 class AppLockService extends ChangeNotifier {
-  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
-  static final LocalAuthentication _auth = LocalAuthentication();
+  final SecurityRepository _securityRepository;
+  final LocalAuthentication _auth;
 
   bool _isLocked = false;
   bool get isLocked => _isLocked;
@@ -15,19 +16,26 @@ class AppLockService extends ChangeNotifier {
   bool _biometricEnabled = false;
   bool get biometricEnabled => _biometricEnabled;
 
-  AppLockService() {
+  AppLockService({
+    SecurityRepository? securityRepository,
+    LocalAuthentication? auth,
+  })  : _securityRepository = securityRepository ?? SecureStorageSecurityRepository(),
+        _auth = auth ?? LocalAuthentication() {
     _loadSecuritySettings();
   }
 
   Future<void> _loadSecuritySettings() async {
-    final pin = await _secureStorage.read(key: 'app_lock_pin');
-    final bio = await _secureStorage.read(key: 'app_lock_biometric');
-    _isPinSet = pin != null && pin.isNotEmpty;
-    _biometricEnabled = bio == 'true';
-    if (_isPinSet) {
-      _isLocked = true;
+    try {
+      final pin = await _securityRepository.getPin();
+      _biometricEnabled = await _securityRepository.isBiometricEnabled();
+      _isPinSet = pin != null && pin.isNotEmpty;
+      if (_isPinSet) {
+        _isLocked = true;
+      }
+      notifyListeners();
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'AppLockService._loadSecuritySettings');
     }
-    notifyListeners();
   }
 
   Future<bool> isBiometricSupported() async {
@@ -35,46 +43,60 @@ class AppLockService extends ChangeNotifier {
       final bool canCheck = await _auth.canCheckBiometrics;
       final bool isSupported = await _auth.isDeviceSupported();
       return canCheck || isSupported;
-    } catch (_) {
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'AppLockService.isBiometricSupported');
       return false;
     }
   }
 
   Future<bool> setPin(String pin) async {
     try {
-      await _secureStorage.write(key: 'app_lock_pin', value: pin);
+      await _securityRepository.savePin(pin);
       _isPinSet = true;
       _isLocked = false;
       notifyListeners();
       return true;
-    } catch (_) {
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'AppLockService.setPin');
       return false;
     }
   }
 
   Future<bool> verifyPin(String enteredPin) async {
-    final storedPin = await _secureStorage.read(key: 'app_lock_pin');
-    if (storedPin == enteredPin) {
-      _isLocked = false;
-      notifyListeners();
-      return true;
+    try {
+      final storedPin = await _securityRepository.getPin();
+      if (storedPin == enteredPin) {
+        _isLocked = false;
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'AppLockService.verifyPin');
+      return false;
     }
-    return false;
   }
 
   Future<void> removePin() async {
-    await _secureStorage.delete(key: 'app_lock_pin');
-    await _secureStorage.delete(key: 'app_lock_biometric');
-    _isPinSet = false;
-    _biometricEnabled = false;
-    _isLocked = false;
-    notifyListeners();
+    try {
+      await _securityRepository.deletePin();
+      _isPinSet = false;
+      _biometricEnabled = false;
+      _isLocked = false;
+      notifyListeners();
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'AppLockService.removePin');
+    }
   }
 
   Future<void> setBiometricEnabled(bool enabled) async {
-    _biometricEnabled = enabled;
-    await _secureStorage.write(key: 'app_lock_biometric', value: enabled.toString());
-    notifyListeners();
+    try {
+      _biometricEnabled = enabled;
+      await _securityRepository.setBiometricEnabled(enabled);
+      notifyListeners();
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'AppLockService.setBiometricEnabled');
+    }
   }
 
   Future<bool> authenticateWithBiometrics() async {
@@ -84,7 +106,7 @@ class AppLockService extends ChangeNotifier {
       if (!isSupported) return false;
 
       final bool didAuthenticate = await _auth.authenticate(
-        localizedReason: 'Personal Finance আনলক করতে আপনার পরিচয় নিশ্চিত করুন',
+        localizedReason: 'MS Image আনলক করতে আপনার পরিচয় নিশ্চিত করুন',
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: false,
@@ -95,7 +117,8 @@ class AppLockService extends ChangeNotifier {
         notifyListeners();
       }
       return didAuthenticate;
-    } catch (_) {
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'AppLockService.authenticateWithBiometrics');
       return false;
     }
   }

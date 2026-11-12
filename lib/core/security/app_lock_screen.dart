@@ -164,7 +164,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
     final lockService = Provider.of<AppLockService>(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A), // Dark slate theme for high security feel
+      backgroundColor:
+          const Color(0xFF0F172A), // Dark slate theme for high security feel
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -250,7 +251,10 @@ class _AppLockScreenState extends State<AppLockScreen> {
               child: _errorMessage != null
                   ? Text(
                       _errorMessage!,
-                      style: const TextStyle(color: Colors.redAccent, fontSize: 13, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold),
                     )
                   : null,
             ),
@@ -272,10 +276,12 @@ class _AppLockScreenState extends State<AppLockScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       // Biometric button (if unlock mode and biometrics enabled)
-                      if (widget.mode == AppLockMode.unlock && lockService.biometricEnabled)
+                      if (widget.mode == AppLockMode.unlock &&
+                          lockService.biometricEnabled)
                         IconButton(
                           iconSize: 32,
-                          icon: const Icon(Icons.fingerprint, color: Colors.blueAccent),
+                          icon: const Icon(Icons.fingerprint,
+                              color: Colors.blueAccent),
                           onPressed: _tryBiometricUnlock,
                         )
                       else
@@ -285,7 +291,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
 
                       IconButton(
                         iconSize: 28,
-                        icon: const Icon(Icons.backspace_outlined, color: Colors.white70),
+                        icon: const Icon(Icons.backspace_outlined,
+                            color: Colors.white70),
                         onPressed: _onDelete,
                       ),
                     ],

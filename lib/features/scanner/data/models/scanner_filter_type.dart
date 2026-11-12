@@ -1,10 +1,9 @@
 enum ScannerFilterType {
   original('Original', 'Original'),
   auto('Auto', 'Auto'),
+  shadow('Shadow Reduction', 'Shadow Reduction'),
   enhanced('Enhanced', 'Enhanced'),
-  grayscale('Grayscale', 'Grayscale'),
-  bw('B&W', 'B&W'),
-  shadow('Shadow Reduction', 'Shadow Reduction');
+  grayscale('Grayscale', 'Grayscale');
 
   final String labelEn;
   final String labelBn;

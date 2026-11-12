@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import '../../data/services/document_detection_service.dart';
@@ -21,7 +23,8 @@ class ScannerCropScreen extends StatefulWidget {
 
 class _ScannerCropScreenState extends State<ScannerCropScreen> {
   late List<Offset> _corners;
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
 
   img.Image? _loadedImage;
   bool _isLoading = true;
@@ -44,10 +47,10 @@ class _ScannerCropScreenState extends State<ScannerCropScreen> {
   Future<void> _loadImage() async {
     try {
       final bytes = await File(widget.imagePath).readAsBytes();
-      final decoded = img.decodeImage(bytes);
+      final decoded = await compute(_decodeAndBakeScanner, bytes);
       if (mounted) {
         setState(() {
-          _loadedImage = decoded != null ? img.bakeOrientation(decoded) : null;
+          _loadedImage = decoded;
           _isLoading = false;
         });
       }
@@ -87,10 +90,18 @@ class _ScannerCropScreenState extends State<ScannerCropScreen> {
 
   void _alignCornersSymmetrically() {
     if (_corners.length != 4) return;
-    final minX = min(min(_corners[0].dx, _corners[1].dx), min(_corners[2].dx, _corners[3].dx)).clamp(0.0, 1.0);
-    final maxX = max(max(_corners[0].dx, _corners[1].dx), max(_corners[2].dx, _corners[3].dx)).clamp(0.0, 1.0);
-    final minY = min(min(_corners[0].dy, _corners[1].dy), min(_corners[2].dy, _corners[3].dy)).clamp(0.0, 1.0);
-    final maxY = max(max(_corners[0].dy, _corners[1].dy), max(_corners[2].dy, _corners[3].dy)).clamp(0.0, 1.0);
+    final minX = min(min(_corners[0].dx, _corners[1].dx),
+            min(_corners[2].dx, _corners[3].dx))
+        .clamp(0.0, 1.0);
+    final maxX = max(max(_corners[0].dx, _corners[1].dx),
+            max(_corners[2].dx, _corners[3].dx))
+        .clamp(0.0, 1.0);
+    final minY = min(min(_corners[0].dy, _corners[1].dy),
+            min(_corners[2].dy, _corners[3].dy))
+        .clamp(0.0, 1.0);
+    final maxY = max(max(_corners[0].dy, _corners[1].dy),
+            max(_corners[2].dy, _corners[3].dy))
+        .clamp(0.0, 1.0);
 
     _corners = [
       Offset(minX, minY),
@@ -132,7 +143,8 @@ class _ScannerCropScreenState extends State<ScannerCropScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('Adjust Crop', style: TextStyle(color: Colors.white, fontSize: 16)),
+        title: const Text('Adjust Crop',
+            style: TextStyle(color: Colors.white, fontSize: 16)),
         titleSpacing: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
@@ -179,7 +191,8 @@ class _ScannerCropScreenState extends State<ScannerCropScreen> {
         ],
       ),
       body: _isLoading || _loadedImage == null
-          ? const Center(child: CircularProgressIndicator(color: Colors.cyanAccent))
+          ? const Center(
+              child: CircularProgressIndicator(color: Colors.cyanAccent))
           : LayoutBuilder(
               builder: (context, constraints) {
                 final imgW = _loadedImage!.width.toDouble();
@@ -187,7 +200,9 @@ class _ScannerCropScreenState extends State<ScannerCropScreen> {
 
                 final bottomPadding = MediaQuery.of(context).padding.bottom;
                 final availW = constraints.maxWidth;
-                final availH = constraints.maxHeight - 64 - bottomPadding; // Leave space for bottom toolbar & safe area
+                final availH = constraints.maxHeight -
+                    64 -
+                    bottomPadding; // Leave space for bottom toolbar & safe area
 
                 final scaleX = availW / imgW;
                 final scaleY = availH / imgH;
@@ -254,22 +269,26 @@ class _ScannerCropScreenState extends State<ScannerCropScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.zoom_out, color: Colors.white),
+                                icon: const Icon(Icons.zoom_out,
+                                    color: Colors.white),
                                 onPressed: _zoomOut,
                                 tooltip: 'Zoom Out',
                               ),
                               IconButton(
-                                icon: const Icon(Icons.zoom_in, color: Colors.white),
+                                icon: const Icon(Icons.zoom_in,
+                                    color: Colors.white),
                                 onPressed: _zoomIn,
                                 tooltip: 'Zoom In',
                               ),
                               IconButton(
-                                icon: const Icon(Icons.crop_free, color: Colors.cyanAccent),
+                                icon: const Icon(Icons.crop_free,
+                                    color: Colors.cyanAccent),
                                 onPressed: _selectAll,
                                 tooltip: 'Full',
                               ),
                               IconButton(
-                                icon: const Icon(Icons.auto_awesome, color: Colors.amberAccent),
+                                icon: const Icon(Icons.auto_awesome,
+                                    color: Colors.amberAccent),
                                 onPressed: _autoDetect,
                                 tooltip: 'Magic',
                               ),
@@ -280,7 +299,8 @@ class _ScannerCropScreenState extends State<ScannerCropScreen> {
                                 ),
                                 icon: const Icon(Icons.check, size: 18),
                                 label: const Text('Apply'),
-                                onPressed: () => Navigator.pop(context, _corners),
+                                onPressed: () =>
+                                    Navigator.pop(context, _corners),
                               ),
                             ],
                           ),
@@ -363,4 +383,9 @@ class _ScannerCropScreenState extends State<ScannerCropScreen> {
       ),
     );
   }
+}
+
+img.Image? _decodeAndBakeScanner(Uint8List bytes) {
+  final decoded = img.decodeImage(bytes);
+  return decoded != null ? img.bakeOrientation(decoded) : null;
 }

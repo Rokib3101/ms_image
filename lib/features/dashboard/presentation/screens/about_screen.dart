@@ -4,9 +4,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
-  static const String appVersion = '1.6.8';
-  static const String buildNumber = '68';
-  static const String githubRepoUrl = 'https://github.com/Rokib3101/ms_smart_tools';
+  static const String appVersion = '1.7.2';
+  static const String buildNumber = '72';
+  static const String githubRepoUrl = 'https://github.com/Rokib3101/ms_image';
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class AboutScreen extends StatelessWidget {
                   'assets/images/app_icon.png',
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Icon(
-                    Icons.construction,
+                    Icons.image,
                     size: 48,
                     color: theme.colorScheme.primary,
                   ),
@@ -47,7 +47,7 @@ class AboutScreen extends StatelessWidget {
 
             // App Name
             Text(
-              'MS Smart Tools',
+              'MS Image',
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: theme.colorScheme.primary,
@@ -57,7 +57,7 @@ class AboutScreen extends StatelessWidget {
 
             // Subtitle
             Text(
-              'All-in-One Smart Utility Suite',
+              'Professional Image Editor & Utility Suite',
               style: TextStyle(
                 fontSize: 14,
                 color: theme.brightness == Brightness.dark
@@ -85,17 +85,19 @@ class AboutScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline, color: theme.colorScheme.primary),
+                        Icon(Icons.info_outline,
+                            color: theme.colorScheme.primary),
                         const SizedBox(width: 10),
                         const Text(
                           'App Description',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                     const Divider(height: 20),
                     Text(
-                      'MS Smart Tools is a comprehensive, offline-first utility application designed to streamline daily tasks. It provides a suite of features including smart finance and wallet tracking, document and QR code scanning, unit and physics conversions, age & BMI calculators, cash counter, shopping list manager, and image editing tools.',
+                      'MS Image is a comprehensive, offline-first image editing and utility application designed for professionals and daily users. It provides robust tools including Document Scanner, QR Code Scanner & Generator, Image Editor, Text on Image, Image Merge, and Image Overlay.',
                       style: TextStyle(
                         fontSize: 14,
                         height: 1.5,
@@ -128,20 +130,27 @@ class AboutScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.star_outline, color: theme.colorScheme.primary),
+                        Icon(Icons.star_outline,
+                            color: theme.colorScheme.primary),
                         const SizedBox(width: 10),
                         const Text(
                           'Key Highlights',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                     const Divider(height: 20),
-                    _buildFeatureRow(context, Icons.lock_outline, '100% Offline & Encrypted Storage'),
-                    _buildFeatureRow(context, Icons.account_balance_wallet_outlined, 'Finance & Wallet Management'),
-                    _buildFeatureRow(context, Icons.scanner_outlined, 'Document & QR Scanner'),
-                    _buildFeatureRow(context, Icons.calculate_outlined, 'Smart Calculators & Converters'),
-                    _buildFeatureRow(context, Icons.image_outlined, 'Image Editing & Overlay Tools'),
+                    _buildFeatureRow(context, Icons.lock_outline,
+                        '100% Offline & Private Processing'),
+                    _buildFeatureRow(context, Icons.scanner_outlined,
+                        'Document Scanner & Cropping'),
+                    _buildFeatureRow(
+                        context, Icons.qr_code, 'QR Code Scanner & Generator'),
+                    _buildFeatureRow(
+                        context, Icons.title, 'Text & Watermarking'),
+                    _buildFeatureRow(context, Icons.image_outlined,
+                        'Image Merge & Overlay'),
                   ],
                 ),
               ),
@@ -156,7 +165,8 @@ class AboutScreen extends StatelessWidget {
                 final build = snapshot.data?.buildNumber ?? buildNumber;
 
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
                     color: theme.brightness == Brightness.dark
                         ? Colors.grey.shade900

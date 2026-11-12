@@ -48,60 +48,102 @@ class ThemeProvider extends ChangeNotifier {
     }
   }
 
-  static ThemeData get lightTheme {
+  static ThemeData get lightTheme => getLightTheme(null);
+  static ThemeData get darkTheme => getDarkTheme(null);
+
+  static ThemeData getLightTheme(ColorScheme? dynamicScheme) {
+    final baseTextTheme = GoogleFonts.anekBanglaTextTheme();
+    final colorScheme = dynamicScheme ?? ColorScheme.fromSeed(
+      seedColor: const Color(0xFF1E88E5),
+      brightness: Brightness.light,
+      secondary: const Color(0xFF26A69A),
+      surface: const Color(0xFFF8FAFC),
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF1E88E5),
-        brightness: Brightness.light,
-        secondary: const Color(0xFF26A69A),
-        surface: const Color(0xFFF5F7FA),
-      ),
-      scaffoldBackgroundColor: const Color(0xFFF5F7FA),
-      textTheme: GoogleFonts.anekBanglaTextTheme(),
-      cardTheme: const CardThemeData(
-        elevation: 2,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
+      textTheme: baseTextTheme,
+      cardTheme: CardThemeData(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey.shade200),
+        ),
         color: Colors.white,
       ),
       appBarTheme: AppBarTheme(
         centerTitle: true,
         backgroundColor: Colors.white,
+        scrolledUnderElevation: 1,
         elevation: 0,
         titleTextStyle: GoogleFonts.anekBangla(
-          color: Colors.black87,
+          color: const Color(0xFF1E293B),
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
       ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(48, 48), // Accessibility target size
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: Colors.white,
+        selectedIconTheme: IconThemeData(color: colorScheme.primary),
+        indicatorColor: colorScheme.primaryContainer,
+      ),
     );
   }
 
-  static ThemeData get darkTheme {
+  static ThemeData getDarkTheme(ColorScheme? dynamicScheme) {
+    final baseTextTheme = GoogleFonts.anekBanglaTextTheme(
+        ThemeData(brightness: Brightness.dark).textTheme);
+    final colorScheme = dynamicScheme ?? ColorScheme.fromSeed(
+      seedColor: const Color(0xFF1E88E5),
+      brightness: Brightness.dark,
+      secondary: const Color(0xFF26A69A),
+      surface: const Color(0xFF0F172A),
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF1E88E5),
-        brightness: Brightness.dark,
-        secondary: const Color(0xFF26A69A),
-        surface: const Color(0xFF121212),
-      ),
-      scaffoldBackgroundColor: const Color(0xFF121212),
-      textTheme: GoogleFonts.anekBanglaTextTheme(ThemeData(brightness: Brightness.dark).textTheme),
-      cardTheme: const CardThemeData(
-        elevation: 2,
-        color: Color(0xFF1E1E1E),
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
+      textTheme: baseTextTheme,
+      cardTheme: CardThemeData(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0xFF1E293B)),
+        ),
+        color: const Color(0xFF1E293B),
       ),
       appBarTheme: AppBarTheme(
         centerTitle: true,
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: const Color(0xFF0F172A),
+        scrolledUnderElevation: 1,
         elevation: 0,
         titleTextStyle: GoogleFonts.anekBangla(
           color: Colors.white,
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: const Color(0xFF0F172A),
+        selectedIconTheme: IconThemeData(color: colorScheme.primary),
+        indicatorColor: colorScheme.primaryContainer,
       ),
     );
   }

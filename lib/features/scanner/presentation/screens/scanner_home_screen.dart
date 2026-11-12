@@ -10,7 +10,8 @@ class ScannerHomeScreen extends StatelessWidget {
   const ScannerHomeScreen({super.key});
 
   Future<void> _pickFromGallery(BuildContext context) async {
-    final hasPermission = await PermissionUtils.requestPhotosPermission(context);
+    final hasPermission =
+        await PermissionUtils.requestPhotosPermission(context);
     if (!hasPermission) return;
 
     final picker = ImagePicker();
@@ -46,7 +47,8 @@ class ScannerHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
-        title: const Text('Document Scanner', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Rotation & Mirror',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -54,42 +56,42 @@ class ScannerHomeScreen extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
               // Hero Graphic & Icon
               Container(
-                width: 110,
-                height: 110,
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
                   color: Colors.deepPurple.shade50,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.document_scanner,
-                  size: 56,
+                  Icons.rotate_right,
+                  size: 54,
                   color: Colors.deepPurple,
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               const Text(
-                'Gallery Document Scanner',
+                'Rotation & Mirror',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
-                'Select document photos from Gallery to detect edges, correct perspective, and enhance readable text.',
+                'Select images from Gallery to rotate and mirror.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Main Action Button
+              // Main Action Buttons
               SizedBox(
                 width: double.infinity,
-                height: 54,
+                height: 52,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
@@ -99,46 +101,41 @@ class ScannerHomeScreen extends StatelessWidget {
                     ),
                     elevation: 2,
                   ),
-                  icon: const Icon(Icons.photo_library, size: 24),
+                  icon: const Icon(Icons.photo_library, size: 22),
                   label: const Text(
-                    'Select from Gallery',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    'Open Gallery',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   onPressed: () => _pickFromGallery(context),
                 ),
               ),
 
-              const SizedBox(height: 36),
+              const SizedBox(height: 32),
 
               // Feature Highlights
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Key Features',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey.shade800),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade800),
                 ),
               ),
               const SizedBox(height: 12),
 
               _buildFeatureTile(
-                icon: Icons.crop_free,
-                title: 'Auto Boundary & Perspective Crop',
-                description: 'Detects paper edges and aligns perspective with 4 draggable corner handles.',
-              ),
-              _buildFeatureTile(
-                icon: Icons.auto_fix_high,
-                title: '6 Scanner Enhancement Filters',
-                description: 'Original, Auto, Enhanced, Grayscale, B&W, and Shadow Reduction.',
-              ),
-              _buildFeatureTile(
-                icon: Icons.photo_library_outlined,
-                title: 'Multi-Page Editing Session',
-                description: 'Process and edit multiple document pages in one seamless workflow.',
+                icon: Icons.rotate_right,
+                title: 'Rotation & Mirror',
+                description:
+                    'Rotate left/right and flip image horizontally or vertically.',
               ),
               _buildFeatureTile(
                 icon: Icons.sd_card_outlined,
-                title: 'Save to MS Smart Tools',
-                description: 'Saves individual clean images directly as JPG or PNG to device storage.',
+                title: 'Save to Gallery',
+                description:
+                    'Saves individual edited images directly as JPG or PNG to MS Smart Tools folder.',
               ),
             ],
           ),
@@ -178,7 +175,8 @@ class ScannerHomeScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                   const SizedBox(height: 2),
                   Text(

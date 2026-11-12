@@ -149,7 +149,8 @@ class SettingsScreen extends StatelessWidget {
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: isSelected
-              ? Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.5))
+              ? Border.all(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.5))
               : Border.all(color: Colors.transparent),
         ),
         child: Row(
@@ -167,7 +168,8 @@ class SettingsScreen extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                       fontSize: 15,
                     ),
                   ),

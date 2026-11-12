@@ -17,17 +17,25 @@ class PerspectiveTransformService {
     final srcH = sourceImage.height;
 
     // Convert normalized corners to pixel coordinates in source image
-    final x0 = (normalizedCorners[0].dx * srcW).clamp(0.0, srcW.toDouble() - 1.0);
-    final y0 = (normalizedCorners[0].dy * srcH).clamp(0.0, srcH.toDouble() - 1.0);
+    final x0 =
+        (normalizedCorners[0].dx * srcW).clamp(0.0, srcW.toDouble() - 1.0);
+    final y0 =
+        (normalizedCorners[0].dy * srcH).clamp(0.0, srcH.toDouble() - 1.0);
 
-    final x1 = (normalizedCorners[1].dx * srcW).clamp(0.0, srcW.toDouble() - 1.0);
-    final y1 = (normalizedCorners[1].dy * srcH).clamp(0.0, srcH.toDouble() - 1.0);
+    final x1 =
+        (normalizedCorners[1].dx * srcW).clamp(0.0, srcW.toDouble() - 1.0);
+    final y1 =
+        (normalizedCorners[1].dy * srcH).clamp(0.0, srcH.toDouble() - 1.0);
 
-    final x2 = (normalizedCorners[2].dx * srcW).clamp(0.0, srcW.toDouble() - 1.0);
-    final y2 = (normalizedCorners[2].dy * srcH).clamp(0.0, srcH.toDouble() - 1.0);
+    final x2 =
+        (normalizedCorners[2].dx * srcW).clamp(0.0, srcW.toDouble() - 1.0);
+    final y2 =
+        (normalizedCorners[2].dy * srcH).clamp(0.0, srcH.toDouble() - 1.0);
 
-    final x3 = (normalizedCorners[3].dx * srcW).clamp(0.0, srcW.toDouble() - 1.0);
-    final y3 = (normalizedCorners[3].dy * srcH).clamp(0.0, srcH.toDouble() - 1.0);
+    final x3 =
+        (normalizedCorners[3].dx * srcW).clamp(0.0, srcW.toDouble() - 1.0);
+    final y3 =
+        (normalizedCorners[3].dy * srcH).clamp(0.0, srcH.toDouble() - 1.0);
 
     // Calculate destination width and height based on max edge lengths
     final topW = sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
@@ -91,7 +99,8 @@ class PerspectiveTransformService {
     return output;
   }
 
-  static img.Color _sampleBilinear(img.Image image, double x, double y, int w, int h) {
+  static img.Color _sampleBilinear(
+      img.Image image, double x, double y, int w, int h) {
     final xClamped = x.clamp(0.0, w - 1.0);
     final yClamped = y.clamp(0.0, h - 1.0);
 
@@ -117,7 +126,8 @@ class PerspectiveTransformService {
     return result;
   }
 
-  static double _bilerp(num v00, num v10, num v01, num v11, double fx, double fy) {
+  static double _bilerp(
+      num v00, num v10, num v01, num v11, double fx, double fy) {
     final top = v00 + (v10 - v00) * fx;
     final bottom = v01 + (v11 - v01) * fx;
     return top + (bottom - top) * fy;

@@ -99,7 +99,8 @@ class AppButton extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
-          minimumSize: Size(isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
+          minimumSize: Size(
+              isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
         );
         return ElevatedButton(
           onPressed: isLoading ? null : onPressed,
@@ -113,7 +114,8 @@ class AppButton extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
-          minimumSize: Size(isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
+          minimumSize: Size(
+              isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
         );
         return ElevatedButton(
           onPressed: isLoading ? null : onPressed,
@@ -126,7 +128,8 @@ class AppButton extends StatelessWidget {
           foregroundColor: colorScheme.primary,
           side: BorderSide(color: colorScheme.primary, width: 1.5),
           shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
-          minimumSize: Size(isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
+          minimumSize: Size(
+              isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
         );
         return OutlinedButton(
           onPressed: isLoading ? null : onPressed,
@@ -140,7 +143,8 @@ class AppButton extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
-          minimumSize: Size(isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
+          minimumSize: Size(
+              isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
         );
         return ElevatedButton(
           onPressed: isLoading ? null : onPressed,
@@ -152,7 +156,8 @@ class AppButton extends StatelessWidget {
         style = TextButton.styleFrom(
           foregroundColor: colorScheme.primary,
           shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
-          minimumSize: Size(isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
+          minimumSize: Size(
+              isFullWidth ? double.infinity : (width ?? 120), height ?? 50),
         );
         return TextButton(
           onPressed: isLoading ? null : onPressed,
@@ -195,7 +200,9 @@ class AppCard extends StatelessWidget {
     return Container(
       margin: margin ?? const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       decoration: BoxDecoration(
-        color: backgroundColor ?? theme.cardTheme.color ?? theme.colorScheme.surface,
+        color: backgroundColor ??
+            theme.cardTheme.color ??
+            theme.colorScheme.surface,
         borderRadius: borderRadius ?? AppRadius.mdRadius,
         boxShadow: elevation > 0
             ? [
@@ -273,7 +280,9 @@ class AppTextField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: theme.colorScheme.primary) : null,
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon, color: theme.colorScheme.primary)
+            : null,
         suffixIcon: suffixIcon,
         filled: true,
         fillColor: theme.brightness == Brightness.dark
@@ -336,12 +345,14 @@ class AppDialogs {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(cancelText, style: GoogleFonts.anekBangla(color: Colors.grey)),
+            child: Text(cancelText,
+                style: GoogleFonts.anekBangla(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDanger ? Colors.red : Theme.of(context).colorScheme.primary,
+              backgroundColor:
+                  isDanger ? Colors.red : Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: AppRadius.smRadius),
             ),

@@ -4,11 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:path/path.dart' as p;
 
 import '../providers/scanner_provider.dart';
-import '../../data/models/scanner_filter_type.dart';
 import '../../data/services/scanner_storage_service.dart';
-import '../widgets/scanner_filter_selector.dart';
 import '../widgets/scanner_page_navigation.dart';
-import 'scanner_crop_screen.dart';
 
 class ScannerEditorScreen extends StatefulWidget {
   const ScannerEditorScreen({super.key});
@@ -30,8 +27,8 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
           appBar: AppBar(
             title: Text(
               provider.totalPages > 1
-                  ? 'Scanner (${provider.currentIndex + 1}/${provider.totalPages})'
-                  : 'Document Scanner',
+                  ? 'Rotation & Mirror (${provider.currentIndex + 1}/${provider.totalPages})'
+                  : 'Rotation & Mirror',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             elevation: 0,
@@ -64,13 +61,14 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                       const SizedBox(height: 16),
                       Text(
                         provider.loadingMessage ?? 'Processing...',
-                        style: const TextStyle(fontSize: 15, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 15, color: Colors.grey),
                       ),
                     ],
                   ),
                 )
               : page == null
-                  ? const Center(child: Text('No document selected'))
+                  ? const Center(child: Text('No image selected'))
                   : Column(
                       children: [
                         // Document Preview Area
@@ -83,7 +81,8 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                             ),
                             child: Stack(
                               children: [
-                                if (previewPath != null && File(previewPath).existsSync())
+                                if (previewPath != null &&
+                                    File(previewPath).existsSync())
                                   Center(
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(12),
@@ -111,7 +110,8 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: const Center(
-                                      child: CircularProgressIndicator(color: Colors.white),
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white),
                                     ),
                                   ),
                               ],
@@ -119,77 +119,71 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                           ),
                         ),
 
-                        // Action Bar: Rotate & Adjust Crop
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          color: Colors.white,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        // Bottom Controls Section with SafeArea to avoid system navigation bar overlap
+                        SafeArea(
+                          bottom: true,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              IconButton.filledTonal(
-                                icon: const Icon(Icons.rotate_left),
-                                tooltip: 'Rotate Left',
-                                onPressed: provider.isLoading
-                                    ? null
-                                    : () => provider.rotateCurrentPageLeft(),
-                              ),
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.deepPurple.shade50,
-                                  foregroundColor: Colors.deepPurple,
-                                  elevation: 0,
+                              // Action Bar: Rotate & Mirror
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 8),
+                                color: Colors.white,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      IconButton.filledTonal(
+                                        icon: const Icon(Icons.rotate_left),
+                                        tooltip: 'Rotate Left',
+                                        onPressed: provider.isLoading
+                                            ? null
+                                            : () => provider
+                                                .rotateCurrentPageLeft(),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      IconButton.filledTonal(
+                                        icon: const Icon(Icons.flip),
+                                        tooltip: 'Mirror Horizontal',
+                                        onPressed: provider.isLoading
+                                            ? null
+                                            : () => provider
+                                                .flipHorizontalCurrentPage(),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      IconButton.filledTonal(
+                                        icon: const Icon(Icons.swap_vert),
+                                        tooltip: 'Mirror Vertical',
+                                        onPressed: provider.isLoading
+                                            ? null
+                                            : () => provider
+                                                .flipVerticalCurrentPage(),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      IconButton.filledTonal(
+                                        icon: const Icon(Icons.rotate_right),
+                                        tooltip: 'Rotate Right',
+                                        onPressed: provider.isLoading
+                                            ? null
+                                            : () => provider
+                                                .rotateCurrentPageRight(),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                icon: const Icon(Icons.crop),
-                                label: const Text('Adjust Crop'),
-                                onPressed: provider.isLoading
-                                    ? null
-                                    : () async {
-                                        final newCorners = await Navigator.push<List<Offset>>(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => ScannerCropScreen(
-                                              imagePath: page.originalImagePath,
-                                              initialCorners: page.corners,
-                                            ),
-                                          ),
-                                        );
-                                        if (newCorners != null) {
-                                          provider.updateCorners(provider.currentIndex, newCorners);
-                                        }
-                                      },
                               ),
-                              IconButton.filledTonal(
-                                icon: const Icon(Icons.rotate_right),
-                                tooltip: 'Rotate Right',
-                                onPressed: provider.isLoading
-                                    ? null
-                                    : () => provider.rotateCurrentPageRight(),
+
+                              // Page Navigation Indicator
+                              ScannerPageNavigation(
+                                currentIndex: provider.currentIndex,
+                                totalPages: provider.totalPages,
+                                onPrevious: () => provider.previousPage(),
+                                onNext: () => provider.nextPage(),
                               ),
                             ],
-                          ),
-                        ),
-
-                        // Page Navigation Indicator
-                        ScannerPageNavigation(
-                          currentIndex: provider.currentIndex,
-                          totalPages: provider.totalPages,
-                          onPrevious: () => provider.previousPage(),
-                          onNext: () => provider.nextPage(),
-                        ),
-
-                        const Divider(height: 1),
-
-                        // Filter Selector Bar
-                        Container(
-                          color: Colors.white,
-                          child: SafeArea(
-                            top: false,
-                            child: ScannerFilterSelector(
-                              selectedFilter: page.selectedFilter,
-                              onFilterSelected: (filter) {
-                                provider.setFilterForCurrentPage(filter);
-                              },
-                            ),
                           ),
                         ),
                       ],
@@ -230,20 +224,22 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Save Scanned Document',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      'Save Edited Image',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: nameController,
                       decoration: const InputDecoration(
-                        labelText: 'Document Name',
+                        labelText: 'Image Name',
                         border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.description),
+                        prefixIcon: Icon(Icons.image),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text('File Format:', style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text('File Format:',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -254,7 +250,8 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                             value: OutputFormat.jpg,
                             groupValue: selectedFormat,
                             onChanged: (val) {
-                              if (val != null) setModalState(() => selectedFormat = val);
+                              if (val != null)
+                                setModalState(() => selectedFormat = val);
                             },
                           ),
                         ),
@@ -265,7 +262,8 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                             value: OutputFormat.png,
                             groupValue: selectedFormat,
                             onChanged: (val) {
-                              if (val != null) setModalState(() => selectedFormat = val);
+                              if (val != null)
+                                setModalState(() => selectedFormat = val);
                             },
                           ),
                         ),
@@ -281,7 +279,8 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.deepPurple.shade50,
                               borderRadius: BorderRadius.circular(12),
@@ -310,8 +309,12 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Smaller Size (20%)', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-                          Text('Best Quality (100%)', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                          Text('Smaller Size (20%)',
+                              style: TextStyle(
+                                  fontSize: 11, color: Colors.grey.shade600)),
+                          Text('Best Quality (100%)',
+                              style: TextStyle(
+                                  fontSize: 11, color: Colors.grey.shade600)),
                         ],
                       ),
                     ],
@@ -334,7 +337,8 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                             compressionQuality.round(),
                           );
                         },
-                        child: const Text('Save to MS Smart Tools', style: TextStyle(fontSize: 16)),
+                        child: const Text('Save to MS Smart Tools',
+                            style: TextStyle(fontSize: 16)),
                       ),
                     ),
                   ],
@@ -369,7 +373,7 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
                 children: [
                   const CircularProgressIndicator(color: Colors.deepPurple),
                   const SizedBox(height: 16),
-                  Text('Saving document $currentStep of $totalSteps...'),
+                  Text('Saving image $currentStep of $totalSteps...'),
                 ],
               ),
             );
@@ -394,7 +398,8 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
       if (savedPaths.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Saved successfully to MS Smart Tools! (${savedPaths.length} file(s))'),
+            content: Text(
+                'Saved successfully to MS Smart Tools! (${savedPaths.length} file(s))'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 3),
           ),
@@ -402,7 +407,7 @@ class _ScannerEditorScreenState extends State<ScannerEditorScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to save document.'),
+            content: Text('Failed to save image.'),
             backgroundColor: Colors.red,
           ),
         );

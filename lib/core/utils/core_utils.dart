@@ -2,13 +2,29 @@ library core_utils;
 
 class BanglaUtils {
   static const Map<String, String> _enToBn = {
-    '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
-    '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯',
+    '0': '০',
+    '1': '১',
+    '2': '২',
+    '3': '৩',
+    '4': '৪',
+    '5': '৫',
+    '6': '৬',
+    '7': '৭',
+    '8': '৮',
+    '9': '৯',
   };
 
   static const Map<String, String> _bnToEn = {
-    '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
-    '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9',
+    '০': '0',
+    '১': '1',
+    '২': '2',
+    '৩': '3',
+    '৪': '4',
+    '৫': '5',
+    '৬': '6',
+    '৭': '7',
+    '৮': '8',
+    '৯': '9',
   };
 
   static String toBangla(dynamic input) {
@@ -49,13 +65,18 @@ class BanglaUtils {
     // Add commas every 2 digits for the remaining part
     String formattedRemaining = '';
     while (remaining.length > 2) {
-      formattedRemaining = ',' + remaining.substring(remaining.length - 2) + formattedRemaining;
+      formattedRemaining =
+          ',' + remaining.substring(remaining.length - 2) + formattedRemaining;
       remaining = remaining.substring(0, remaining.length - 2);
     }
 
     formattedRemaining = remaining + formattedRemaining;
 
-    return (isNegative ? '-' : '') + formattedRemaining + ',' + lastThree + decimalPart;
+    return (isNegative ? '-' : '') +
+        formattedRemaining +
+        ',' +
+        lastThree +
+        decimalPart;
   }
 
   static String toEnglish(String input) {

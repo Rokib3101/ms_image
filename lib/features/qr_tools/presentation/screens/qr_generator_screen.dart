@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:gal/gal.dart';
 import '../../../../core/utils/storage_utils.dart';
 
 class QrGeneratorScreen extends StatefulWidget {
@@ -31,11 +30,15 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
         final imageFile = File(imagePath);
         await imageFile.writeAsBytes(imageBytes);
 
-        final savedPath = await StorageUtils.saveFileToCustomFolder(imagePath, fileName);
+        final savedPath =
+            await StorageUtils.saveFileToCustomFolder(imagePath, fileName);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(savedPath != null ? 'QR code saved to MS Smart Tools folder!' : 'Failed to save!')),
+            SnackBar(
+                content: Text(savedPath != null
+                    ? 'QR code saved to MS Smart Tools folder!'
+                    : 'Failed to save!')),
           );
         }
       }
@@ -62,7 +65,8 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
               controller: _controller,
               decoration: InputDecoration(
                 labelText: 'Enter Link or Text',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.qr_code),
                   onPressed: () => setState(() => _qrData = _controller.text),
@@ -94,16 +98,22 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
                   ElevatedButton.icon(
                     onPressed: _isSaving ? null : _saveQrImage,
                     icon: _isSaving
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Icon(Icons.download),
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.download),
                     label: Text(_isSaving ? 'Saving...' : 'Save to Gallery'),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text('Scan this code to view information', style: TextStyle(color: Colors.black54)),
+                  const Text('Scan this code to view information',
+                      style: TextStyle(color: Colors.black54)),
                 ],
               )
             else
@@ -111,7 +121,8 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
                 child: Column(
                   children: [
                     Icon(Icons.qr_code_2, size: 100, color: Colors.grey),
-                    Text('Type text and tap generate button', style: TextStyle(color: Colors.grey)),
+                    Text('Type text and tap generate button',
+                        style: TextStyle(color: Colors.grey)),
                   ],
                 ),
               ),

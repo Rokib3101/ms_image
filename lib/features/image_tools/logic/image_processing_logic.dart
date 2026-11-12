@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:image/image.dart' as img;
@@ -38,7 +40,9 @@ class EnhancementParams {
     this.isDocumentMode = false,
   });
 
-  factory EnhancementParams.fromPreset(EnhancementPreset preset, double strength, {double documentConfidence = 0.5}) {
+  factory EnhancementParams.fromPreset(
+      EnhancementPreset preset, double strength,
+      {double documentConfidence = 0.5}) {
     switch (preset) {
       case EnhancementPreset.natural:
         return EnhancementParams(
@@ -99,9 +103,11 @@ class EnhancementParams {
       default:
         bool isDoc = documentConfidence > 0.4;
         if (isDoc) {
-          return EnhancementParams.fromPreset(EnhancementPreset.document, strength);
+          return EnhancementParams.fromPreset(
+              EnhancementPreset.document, strength);
         } else {
-          return EnhancementParams.fromPreset(EnhancementPreset.natural, strength);
+          return EnhancementParams.fromPreset(
+              EnhancementPreset.natural, strength);
         }
     }
   }
@@ -152,7 +158,8 @@ class ImageProcessingLogic {
     return filePath;
   }
 
-  static img.Image _mergeHorizontal(List<img.Image> images, int spacing, int? bg) {
+  static img.Image _mergeHorizontal(
+      List<img.Image> images, int spacing, int? bg) {
     int totalWidth = (images.length - 1) * spacing;
     int maxHeight = 0;
 
@@ -162,18 +169,22 @@ class ImageProcessingLogic {
     }
 
     final result = img.Image(width: totalWidth, height: maxHeight);
-    if (bg != null) result.clear(img.ColorUint32.rgba(bg >> 24, (bg >> 16) & 0xFF, (bg >> 8) & 0xFF, bg & 0xFF));
+    if (bg != null)
+      result.clear(img.ColorUint32.rgba(
+          bg >> 24, (bg >> 16) & 0xFF, (bg >> 8) & 0xFF, bg & 0xFF));
 
     int xOffset = 0;
     for (var image in images) {
-      img.compositeImage(result, image, dstX: xOffset, dstY: (maxHeight - image.height) ~/ 2);
+      img.compositeImage(result, image,
+          dstX: xOffset, dstY: (maxHeight - image.height) ~/ 2);
       xOffset += image.width + spacing;
     }
 
     return result;
   }
 
-  static img.Image _mergeVertical(List<img.Image> images, int spacing, int? bg) {
+  static img.Image _mergeVertical(
+      List<img.Image> images, int spacing, int? bg) {
     int totalHeight = (images.length - 1) * spacing;
     int maxWidth = 0;
 
@@ -183,11 +194,14 @@ class ImageProcessingLogic {
     }
 
     final result = img.Image(width: maxWidth, height: totalHeight);
-    if (bg != null) result.clear(img.ColorUint32.rgba(bg >> 24, (bg >> 16) & 0xFF, (bg >> 8) & 0xFF, bg & 0xFF));
+    if (bg != null)
+      result.clear(img.ColorUint32.rgba(
+          bg >> 24, (bg >> 16) & 0xFF, (bg >> 8) & 0xFF, bg & 0xFF));
 
     int yOffset = 0;
     for (var image in images) {
-      img.compositeImage(result, image, dstX: (maxWidth - image.width) ~/ 2, dstY: yOffset);
+      img.compositeImage(result, image,
+          dstX: (maxWidth - image.width) ~/ 2, dstY: yOffset);
       yOffset += image.height + spacing;
     }
 
@@ -210,14 +224,17 @@ class ImageProcessingLogic {
     int totalHeight = (rows * cellHeight) + ((rows - 1) * spacing);
 
     final result = img.Image(width: totalWidth, height: totalHeight);
-    if (bg != null) result.clear(img.ColorUint32.rgba(bg >> 24, (bg >> 16) & 0xFF, (bg >> 8) & 0xFF, bg & 0xFF));
+    if (bg != null)
+      result.clear(img.ColorUint32.rgba(
+          bg >> 24, (bg >> 16) & 0xFF, (bg >> 8) & 0xFF, bg & 0xFF));
 
     for (int i = 0; i < images.length; i++) {
       int col = i % columns;
       int row = i ~/ columns;
 
       int x = col * (cellWidth + spacing) + (cellWidth - images[i].width) ~/ 2;
-      int y = row * (cellHeight + spacing) + (cellHeight - images[i].height) ~/ 2;
+      int y =
+          row * (cellHeight + spacing) + (cellHeight - images[i].height) ~/ 2;
 
       img.compositeImage(result, images[i], dstX: x, dstY: y);
     }
@@ -225,30 +242,41 @@ class ImageProcessingLogic {
     return result;
   }
 
-  /// Creates a resized preview image for faster processing
+  /// Creates a resized preview image for faster processing without blocking UI thread
   static Future<String?> createPreviewImage({
     required String imagePath,
     int maxDimension = 1200,
   }) async {
     try {
       final bytes = await File(imagePath).readAsBytes();
-      img.Image? source = img.decodeImage(bytes);
-      if (source == null) return null;
-
-      if (source.width <= maxDimension && source.height <= maxDimension) return imagePath;
-
-      img.Image resized;
-      if (source.width > source.height) {
-        resized = img.copyResize(source, width: maxDimension, interpolation: img.Interpolation.linear);
-      } else {
-        resized = img.copyResize(source, height: maxDimension, interpolation: img.Interpolation.linear);
-      }
-
+      
       final tempDir = await getTemporaryDirectory();
       final fileName = 'preview_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final filePath = p.join(tempDir.path, fileName);
 
-      await File(filePath).writeAsBytes(img.encodeJpg(resized, quality: 85));
+      final resultBytes = await Isolate.run(() {
+        final img.Image? source = img.decodeImage(bytes);
+        if (source == null) return null;
+
+        if (source.width <= maxDimension && source.height <= maxDimension) {
+          return bytes;
+        }
+
+        img.Image resized;
+        if (source.width > source.height) {
+          resized = img.copyResize(source,
+              width: maxDimension, interpolation: img.Interpolation.linear);
+        } else {
+          resized = img.copyResize(source,
+              height: maxDimension, interpolation: img.Interpolation.linear);
+        }
+
+        return Uint8List.fromList(img.encodeJpg(resized, quality: 85));
+      });
+
+      if (resultBytes == null) return null;
+
+      await File(filePath).writeAsBytes(resultBytes);
       return filePath;
     } catch (e) {
       debugPrint('Preview Creation Error: $e');
@@ -286,11 +314,13 @@ class ImageProcessingLogic {
 
       // 1. Analyze image for document characteristics
       double docConfidence = _calculateDocumentConfidence(image);
-      final params = EnhancementParams.fromPreset(preset, strength, documentConfidence: docConfidence);
+      final params = EnhancementParams.fromPreset(preset, strength,
+          documentConfidence: docConfidence);
 
       // 2. Background/Illumination Estimation (Robust percentile-based)
       const int blockSize = 32;
-      final illuminationMap = _estimateIllumination(image, blockSize: blockSize, percentile: 0.95);
+      final illuminationMap =
+          _estimateIllumination(image, blockSize: blockSize, percentile: 0.95);
 
       // 3. Background Normalization & Shadow Removal
       var result = _applyIlluminationCorrection(
@@ -303,8 +333,11 @@ class ImageProcessingLogic {
       );
 
       // 4. Contrast, Brightness & Saturation
-      if (params.contrast != 0 || params.brightness != 0 || params.saturation != 0) {
-        img.adjustColor(result,
+      if (params.contrast != 0 ||
+          params.brightness != 0 ||
+          params.saturation != 0) {
+        img.adjustColor(
+          result,
           contrast: 1.0 + params.contrast,
           brightness: 1.0 + params.brightness,
           saturation: 1.0 + params.saturation,
@@ -315,9 +348,15 @@ class ImageProcessingLogic {
       if (params.sharpening > 0) {
         final double sharp = params.sharpening;
         img.convolution(result, filter: [
-          0, -sharp, 0,
-          -sharp, 1 + 4 * sharp, -sharp,
-          0, -sharp, 0
+          0,
+          -sharp,
+          0,
+          -sharp,
+          1 + 4 * sharp,
+          -sharp,
+          0,
+          -sharp,
+          0
         ]);
       }
 
@@ -349,11 +388,13 @@ class ImageProcessingLogic {
     return (brightCount / samples).clamp(0.0, 1.0);
   }
 
-  static List<List<List<double>>> _estimateIllumination(img.Image image, {required int blockSize, double percentile = 0.95}) {
+  static List<List<List<double>>> _estimateIllumination(img.Image image,
+      {required int blockSize, double percentile = 0.95}) {
     final int blocksX = (image.width / blockSize).ceil();
     final int blocksY = (image.height / blockSize).ceil();
 
-    final List<List<List<double>>> map = List.generate(blocksY, (_) => List.generate(blocksX, (_) => [255.0, 255.0, 255.0]));
+    final List<List<List<double>>> map = List.generate(
+        blocksY, (_) => List.generate(blocksX, (_) => [255.0, 255.0, 255.0]));
 
     for (int by = 0; by < blocksY; by++) {
       for (int bx = 0; bx < blocksX; bx++) {
@@ -402,7 +443,8 @@ class ImageProcessingLogic {
   ) {
     final int blocksY = illuminationMap.length;
     final int blocksX = illuminationMap[0].length;
-    final result = img.Image(width: image.width, height: image.height, numChannels: 4);
+    final result =
+        img.Image(width: image.width, height: image.height, numChannels: 4);
 
     for (int y = 0; y < image.height; y++) {
       final double fby = (y / blockSize).clamp(0.0, blocksY - 1.0);
@@ -416,9 +458,27 @@ class ImageProcessingLogic {
         final int bx1 = min(bx0 + 1, blocksX - 1);
         final double dx = fbx - bx0;
 
-        final double bgR = _bilinear(illuminationMap[by0][bx0][0], illuminationMap[by0][bx1][0], illuminationMap[by1][bx0][0], illuminationMap[by1][bx1][0], dx, dy);
-        final double bgG = _bilinear(illuminationMap[by0][bx0][1], illuminationMap[by0][bx1][1], illuminationMap[by1][bx0][1], illuminationMap[by1][bx1][1], dx, dy);
-        final double bgB = _bilinear(illuminationMap[by0][bx0][2], illuminationMap[by0][bx1][2], illuminationMap[by1][bx0][2], illuminationMap[by1][bx1][2], dx, dy);
+        final double bgR = _bilinear(
+            illuminationMap[by0][bx0][0],
+            illuminationMap[by0][bx1][0],
+            illuminationMap[by1][bx0][0],
+            illuminationMap[by1][bx1][0],
+            dx,
+            dy);
+        final double bgG = _bilinear(
+            illuminationMap[by0][bx0][1],
+            illuminationMap[by0][bx1][1],
+            illuminationMap[by1][bx0][1],
+            illuminationMap[by1][bx1][1],
+            dx,
+            dy);
+        final double bgB = _bilinear(
+            illuminationMap[by0][bx0][2],
+            illuminationMap[by0][bx1][2],
+            illuminationMap[by1][bx0][2],
+            illuminationMap[by1][bx1][2],
+            dx,
+            dy);
 
         final pixel = image.getPixel(x, y);
 
@@ -445,12 +505,14 @@ class ImageProcessingLogic {
         double finalG = _lerp(pixel.g.toDouble(), targetG, normalizationAmount);
         double finalB = _lerp(pixel.b.toDouble(), targetB, normalizationAmount);
 
-        result.setPixel(x, y, img.ColorUint32.rgba(
-          finalR.toInt().clamp(0, 255),
-          finalG.toInt().clamp(0, 255),
-          finalB.toInt().clamp(0, 255),
-          pixel.a.toInt()
-        ));
+        result.setPixel(
+            x,
+            y,
+            img.ColorUint32.rgba(
+                finalR.toInt().clamp(0, 255),
+                finalG.toInt().clamp(0, 255),
+                finalB.toInt().clamp(0, 255),
+                pixel.a.toInt()));
       }
     }
     return result;
@@ -458,18 +520,20 @@ class ImageProcessingLogic {
 
   static double _lerp(double a, double b, double t) => a * (1 - t) + b * t;
 
-  static double _bilinear(double v00, double v01, double v10, double v11, double dx, double dy) {
+  static double _bilinear(
+      double v00, double v01, double v10, double v11, double dx, double dy) {
     return v00 * (1 - dx) * (1 - dy) +
-           v01 * dx * (1 - dy) +
-           v10 * (1 - dx) * dy +
-           v11 * dx * dy;
+        v01 * dx * (1 - dy) +
+        v10 * (1 - dx) * dy +
+        v11 * dx * dy;
   }
 
   /// Image Overlay
   static Future<String?> overlayImages({
     required String backgroundPath,
     required String foregroundPath,
-    required Rect foregroundRect, // Normalized 0-1 or actual pixel? Let's use actual pixels relative to background size.
+    required Rect
+        foregroundRect, // Normalized 0-1 or actual pixel? Let's use actual pixels relative to background size.
   }) async {
     final bgBytes = await File(backgroundPath).readAsBytes();
     final fgBytes = await File(foregroundPath).readAsBytes();

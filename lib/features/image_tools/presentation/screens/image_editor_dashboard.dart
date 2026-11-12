@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ms_smart_tools/core/navigation/app_router.dart';
+import 'package:ms_image/core/navigation/app_router.dart';
 
 class ImageEditorDashboard extends StatelessWidget {
   const ImageEditorDashboard({super.key});
@@ -18,18 +18,18 @@ class ImageEditorDashboard extends StatelessWidget {
         crossAxisSpacing: 16,
         children: [
           _EditorCard(
-            title: 'Image Merge',
-            subtitle: 'Combine Photos',
-            icon: Icons.call_merge,
-            color: Colors.blue,
-            onTap: () => context.push(AppRoutes.imageMerge),
+            title: 'Collage',
+            subtitle: 'Create Photo Collage',
+            icon: Icons.grid_view_rounded,
+            color: Colors.purple,
+            onTap: () => context.push(AppRoutes.collage),
           ),
           _EditorCard(
-            title: 'Image Overlay',
+            title: 'Overlay',
             subtitle: 'Layers & Background',
             icon: Icons.layers,
             color: Colors.teal,
-            onTap: () => context.push(AppRoutes.imageOverlay),
+            onTap: () => context.push(AppRoutes.overlay),
           ),
         ],
       ),

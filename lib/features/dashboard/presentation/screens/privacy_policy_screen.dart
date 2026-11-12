@@ -37,7 +37,6 @@ class PrivacyPolicyScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
             _buildSectionCard(
               context: context,
               title: '1. Local Data Storage (Offline & Encrypted)',
@@ -46,22 +45,18 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   '• Local Data: All your financial records, wallets, transactions, scanned documents, shopping lists, and app preferences are stored strictly on your device using encrypted local storage (Hive).\n'
                   '• Cloud Data: We do not upload or transmit any of your personal data, documents, or financial history to any cloud server or third party. The app functions completely offline to guarantee total privacy.',
             ),
-
             const SizedBox(height: 16),
-
             _buildSectionCard(
               context: context,
               title: '2. Permission Policy',
               icon: Icons.security_outlined,
               content:
                   'No sensitive permissions are requested upon app installation. Permissions are requested dynamically only when you access specific features:\n\n'
-                  '• Camera: Required when utilizing the QR Code Scanner or Document Scanner.\n'
+                  '• Camera: Required when utilizing the QR Code Scanner or Image Editor.\n'
                   '• Photo Gallery: Required when importing images or documents from your device gallery for scanning or photo editing.\n'
                   '• Broad or unnecessary storage permissions are strictly avoided to keep your system safe.',
             ),
-
             const SizedBox(height: 16),
-
             _buildSectionCard(
               context: context,
               title: '3. Data Export & Erasure',
@@ -70,9 +65,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   '• Data Export: You can export your financial reports and records in JSON or CSV format whenever you choose.\n'
                   '• Data Erasure: You retain full authority to clear trashed items, permanently delete specific records, or perform a full app data reset at any time.',
             ),
-
             const SizedBox(height: 16),
-
             _buildSectionCard(
               context: context,
               title: '4. Third-Party Services & Analytics',
@@ -117,7 +110,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],

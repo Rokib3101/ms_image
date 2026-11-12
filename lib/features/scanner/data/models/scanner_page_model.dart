@@ -1,36 +1,35 @@
-import 'dart:ui';
-import 'scanner_filter_type.dart';
+import '../../../image_tools/data/services/text_overlay_service.dart';
 
 class ScannerPageModel {
   final String id;
   final String originalImagePath;
-  List<Offset> corners; // 4 normalized corners [top-left, top-right, bottom-right, bottom-left]
   int rotationAngle; // 0, 90, 180, 270 degrees
-  ScannerFilterType selectedFilter;
-  bool isDetected;
+  bool isFlippedHorizontal;
+  bool isFlippedVertical;
+  List<TextOverlayData> textOverlays;
 
   ScannerPageModel({
     required this.id,
     required this.originalImagePath,
-    required this.corners,
     this.rotationAngle = 0,
-    this.selectedFilter = ScannerFilterType.auto,
-    this.isDetected = false,
+    this.isFlippedHorizontal = false,
+    this.isFlippedVertical = false,
+    this.textOverlays = const [],
   });
 
   ScannerPageModel copyWith({
-    List<Offset>? corners,
     int? rotationAngle,
-    ScannerFilterType? selectedFilter,
-    bool? isDetected,
+    bool? isFlippedHorizontal,
+    bool? isFlippedVertical,
+    List<TextOverlayData>? textOverlays,
   }) {
     return ScannerPageModel(
       id: id,
       originalImagePath: originalImagePath,
-      corners: corners ?? List.from(this.corners),
       rotationAngle: rotationAngle ?? this.rotationAngle,
-      selectedFilter: selectedFilter ?? this.selectedFilter,
-      isDetected: isDetected ?? this.isDetected,
+      isFlippedHorizontal: isFlippedHorizontal ?? this.isFlippedHorizontal,
+      isFlippedVertical: isFlippedVertical ?? this.isFlippedVertical,
+      textOverlays: textOverlays ?? List.from(this.textOverlays),
     );
   }
 }

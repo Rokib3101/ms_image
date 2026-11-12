@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:image/image.dart' as img;
+import '../../../../core/errors/error_handler.dart';
 import '../../../../core/utils/storage_utils.dart';
 
 enum OutputFormat { jpg, png }
@@ -25,14 +26,12 @@ class ScannerStorageService {
       final timestamp = generateTimestamp();
       final extension = format == OutputFormat.jpg ? 'jpg' : 'png';
 
-      // Format filename according to specification:
-      // Single page: baseName_YYMMDDHHMMSS.jpg
-      // Multi page: baseName_page1_YYMMDDHHMMSS.jpg
       String fileName;
       final cleanBaseName = _sanitizeFileName(baseName);
 
       if (totalPages != null && totalPages > 1 && pageIndex != null) {
-        fileName = '${cleanBaseName}_page${pageIndex + 1}_$timestamp.$extension';
+        fileName =
+            '${cleanBaseName}_page${pageIndex + 1}_$timestamp.$extension';
       } else {
         fileName = '${cleanBaseName}_$timestamp.$extension';
       }
@@ -55,7 +54,8 @@ class ScannerStorageService {
       await StorageUtils.saveFileToCustomFolder(targetPath, fileName);
 
       return targetPath;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'ScannerStorageService.saveImage');
       return null;
     }
   }
@@ -63,11 +63,33 @@ class ScannerStorageService {
   static String _sanitizeFileName(String name) {
     var s = name.trim();
     if (s.isEmpty) s = 'document';
-    // Remove extension if user entered it
-    if (s.toLowerCase().endsWith('.jpg') || s.toLowerCase().endsWith('.png') || s.toLowerCase().endsWith('.jpeg')) {
+    if (s.toLowerCase().endsWith('.jpg') ||
+        s.toLowerCase().endsWith('.png') ||
+        s.toLowerCase().endsWith('.jpeg')) {
       s = s.substring(0, s.lastIndexOf('.'));
     }
-    // Replace invalid filesystem characters
     return s.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+  }
+
+  /// Deletes a saved image or document file from disk to avoid orphan files
+  static Future<bool> deleteImageFile(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (await file.exists()) {
+        await file.delete();
+        return true;
+      }
+      return false;
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'ScannerStorageService.deleteImageFile');
+      return false;
+    }
+  }
+
+  /// Deletes multiple files from disk
+  static Future<void> deleteDocumentFiles(List<String> filePaths) async {
+    for (final path in filePaths) {
+      await deleteImageFile(path);
+    }
   }
 }

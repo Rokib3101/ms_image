@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import '../database/repositories/recent_tools_repository.dart';
+import '../errors/error_handler.dart';
 import 'tool_registry.dart';
 import 'smart_tool_model.dart';
 
 class ToolProvider extends ChangeNotifier {
-  static const String _recentBoxName = 'recent_tools';
-  
+  final RecentToolsRepository _repository;
+
   List<String> _recent = [];
 
   List<SmartTool> get recentTools {
@@ -19,46 +20,38 @@ class ToolProvider extends ChangeNotifier {
     return list.take(5).toList();
   }
 
-  ToolProvider() {
+  ToolProvider({RecentToolsRepository? repository})
+      : _repository = repository ?? HiveRecentToolsRepository() {
     _loadData();
   }
 
   Future<void> _loadData() async {
-    final recentBox = await Hive.openBox<String>(_recentBoxName);
-    
-    // Clear existing database entries for recent tools as requested
-    await recentBox.clear();
-    _recent.clear();
-
-    notifyListeners();
+    try {
+      _recent = await _repository.getRecentTools();
+      notifyListeners();
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'ToolProvider._loadData');
+    }
   }
 
   Future<void> addToRecent(String toolId) async {
-    final box = Hive.box<String>(_recentBoxName);
-    
-    // Remove if already exists to move to top
-    _recent.remove(toolId);
-    
-    // Insert at beginning
-    _recent.insert(0, toolId);
-    
-    // Keep only last 10
-    if (_recent.length > 10) {
-      _recent = _recent.sublist(0, 10);
+    try {
+      await _repository.addRecentTool(toolId);
+      _recent = await _repository.getRecentTools();
+      notifyListeners();
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'ToolProvider.addToRecent');
     }
-
-    // Update Hive
-    await box.clear();
-    await box.addAll(_recent);
-    
-    notifyListeners();
   }
 
-  /// Clears all stored recent tools from database
+  /// Clears all stored recent tools from repository
   Future<void> clearRecentTools() async {
-    final box = Hive.box<String>(_recentBoxName);
-    await box.clear();
-    _recent.clear();
-    notifyListeners();
+    try {
+      await _repository.clearRecentTools();
+      _recent.clear();
+      notifyListeners();
+    } catch (e, stackTrace) {
+      ErrorHandler.logError(e, stackTrace, 'ToolProvider.clearRecentTools');
+    }
   }
 }

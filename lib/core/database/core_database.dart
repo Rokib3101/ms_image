@@ -14,7 +14,8 @@ class LocalPersistence {
 
     // Secure key generation/retrieval for Finance data encryption
     const secureStorage = FlutterSecureStorage();
-    String? keyString = await secureStorage.read(key: 'ms_smart_tools_finance_key');
+    String? keyString =
+        await secureStorage.read(key: 'ms_smart_tools_finance_key');
 
     List<int> key;
     if (keyString == null) {
@@ -39,5 +40,11 @@ class LocalPersistence {
       return Hive.box<T>(boxName);
     }
     return await Hive.openBox<T>(boxName, encryptionCipher: financeCipher);
+  }
+
+  /// Closes all open Hive boxes safely to prevent memory leaks
+  static Future<void> closeAllBoxes() async {
+    await Hive.close();
+    isInitialized = false;
   }
 }

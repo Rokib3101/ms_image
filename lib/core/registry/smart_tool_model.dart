@@ -13,6 +13,14 @@ enum ToolCategory {
   const ToolCategory(this.title, this.icon, this.color);
 }
 
+enum PayloadKind {
+  image,
+  images,
+  text,
+  pdf,
+  qrCode,
+}
+
 class SmartTool {
   final String id;
   final String titleBn;
@@ -23,11 +31,13 @@ class SmartTool {
   final List<String> keywords;
   final Widget screen;
   final String route;
+  final Set<PayloadKind> accepts;
 
   // Metadata for permissions & analytics
   final bool requiresCamera;
   final bool requiresStorage;
   final String analyticsEventName;
+  final String? badge;
 
   const SmartTool({
     required this.id,
@@ -39,8 +49,10 @@ class SmartTool {
     required this.keywords,
     required this.screen,
     required this.route,
+    this.accepts = const {},
     this.requiresCamera = false,
     this.requiresStorage = false,
+    this.badge,
     String? analyticsEventName,
   }) : analyticsEventName = analyticsEventName ?? 'tool_open_$id';
 }

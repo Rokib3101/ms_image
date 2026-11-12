@@ -1,20 +1,32 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:ms_smart_tools/main.dart';
+import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:ms_image/main.dart';
+import 'package:ms_image/core/registry/tool_provider.dart';
+import 'package:ms_image/features/scanner/presentation/providers/scanner_provider.dart';
+import 'package:ms_image/core/theme/theme_provider.dart';
 
 void main() {
-  testWidgets('Dashboard smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const SmartToolsApp());
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that the app title is present.
-    expect(find.text('MS Smart Tools'), findsOneWidget);
+  setUpAll(() async {
+    final tempDir = Directory.systemTemp.createTempSync();
+    Hive.init(tempDir.path);
+  });
+
+  testWidgets('MS Image app smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ToolProvider()),
+          ChangeNotifierProvider(create: (_) => ScannerProvider()),
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ],
+        child: const MSImageApp(),
+      ),
+    );
+
+    expect(find.text('MS Image'), findsOneWidget);
   });
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/registry/tool_registry.dart';
 import '../../../../core/ui/app_more_menu.dart';
 
 class MSImageDashboard extends StatelessWidget {
@@ -7,43 +8,7 @@ class MSImageDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tools = [
-      _ImageToolItem(
-        title: 'QR Scanner',
-        subtitle: 'Scan QR & Barcodes',
-        icon: Icons.qr_code_scanner,
-        color: Colors.teal,
-        route: '/qr-scanner',
-      ),
-      _ImageToolItem(
-        title: 'QR Generator',
-        subtitle: 'Create Custom QR Code',
-        icon: Icons.qr_code,
-        color: Colors.indigo,
-        route: '/qr-generator',
-      ),
-      _ImageToolItem(
-        title: 'Image Merge',
-        subtitle: 'Combine Multiple Images',
-        icon: Icons.call_merge,
-        color: Colors.blue,
-        route: '/image-merge',
-      ),
-      _ImageToolItem(
-        title: 'Image Overlay',
-        subtitle: 'Add Layers & Watermarks',
-        icon: Icons.layers,
-        color: Colors.green,
-        route: '/image-overlay',
-      ),
-      _ImageToolItem(
-        title: 'Document Scanner',
-        subtitle: 'Scan & Crop Documents',
-        icon: Icons.document_scanner,
-        color: Colors.deepPurple,
-        route: '/doc-scanner',
-      ),
-    ];
+    final tools = ToolRegistry.allTools;
 
     return Scaffold(
       appBar: AppBar(
@@ -86,7 +51,7 @@ class MSImageDashboard extends StatelessWidget {
                       Icon(tool.icon, color: tool.color, size: 36),
                       const SizedBox(height: 12),
                       Text(
-                        tool.title,
+                        tool.titleEn,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
@@ -95,9 +60,9 @@ class MSImageDashboard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        tool.subtitle,
+                        tool.keywords.take(2).join(', '),
                         textAlign: TextAlign.center,
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.grey[600],
@@ -114,20 +79,4 @@ class MSImageDashboard extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ImageToolItem {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final String route;
-
-  const _ImageToolItem({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    required this.route,
-  });
 }

@@ -1,6 +1,6 @@
-name: ms_smart_tools
-description: "MS Smart Tools"
-version: 1.7.2+72
+name: ms_image
+description: "MS Image - QR Scanner, QR Generator, Image Editor & Image Tools"
+version: 1.8.9+95
 publish_to: 'none'
 
 environment:
@@ -17,8 +17,6 @@ dependencies:
   provider: ^6.1.1
   uuid: ^4.2.1
   intl: ^0.19.0
-  fl_chart: ^0.66.0
-  math_expressions: ^2.4.0
   qr_flutter: ^4.1.0
   mobile_scanner: ^5.2.3
   url_launcher: ^6.2.5
@@ -36,6 +34,8 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   local_auth: ^2.3.0
   file_picker: ^8.3.1
+  archive: ^3.6.1
+  dynamic_color: ^1.7.0
 
 dev_dependencies:
   flutter_test:
@@ -48,18 +48,12 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: false
-  image_path: "assets/images/app_icon.png"
-  flavors:
-    calculator:
-      image_path: "assets/images/MS Calculator.png"
-    finance:
-      image_path: "assets/images/MS Finance.png"
-    image:
-      image_path: "assets/images/MS Image.png"
-    full:
-      image_path: "assets/images/app_icon.png"
+  image_path: "assets/images/MS Image.png"
+  web:
+    generate: true
+    image_path: "assets/images/MS Image.png"
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/app_icon.png
+    - assets/images/MS Image.png

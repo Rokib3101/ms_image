@@ -30,12 +30,14 @@ class ScannerFilterSelector extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: isSelected ? Colors.deepPurple : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? Colors.deepPurple : Colors.grey.shade300,
+                    color:
+                        isSelected ? Colors.deepPurple : Colors.grey.shade300,
                     width: isSelected ? 2 : 1,
                   ),
                   boxShadow: isSelected
@@ -55,8 +57,11 @@ class ScannerFilterSelector extends StatelessWidget {
                       filter.labelEn,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                        color: isSelected ? Colors.white : Colors.black.withValues(alpha: 0.8),
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : Colors.black.withValues(alpha: 0.8),
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -64,7 +69,8 @@ class ScannerFilterSelector extends StatelessWidget {
                       filter.labelBn,
                       style: TextStyle(
                         fontSize: 10,
-                        color: isSelected ? Colors.white70 : Colors.grey.shade600,
+                        color:
+                            isSelected ? Colors.white70 : Colors.grey.shade600,
                       ),
                     ),
                   ],

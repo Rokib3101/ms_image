@@ -14,7 +14,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.mssmarttools.app"
+    namespace = "com.rokib3101.msimage"
     compileSdk = 36
     buildToolsVersion = "36.0.0"
     ndkVersion = flutter.ndkVersion
@@ -33,35 +33,12 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.mssmarttools.app"
-        minSdk = 24 // Updated for better library support
+        applicationId = "com.rokib3101.msimage"
+        minSdk = 24
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-    }
-
-    flavorDimensions.add("app")
-    productFlavors {
-        create("calculator") {
-            dimension = "app"
-            applicationId = "com.mssmarttools.calculator"
-            resValue("string", "app_name", "MS Calculator")
-        }
-        create("finance") {
-            dimension = "app"
-            applicationId = "com.mssmarttools.finance"
-            resValue("string", "app_name", "MS Finance")
-        }
-        create("image") {
-            dimension = "app"
-            applicationId = "com.mssmarttools.image"
-            resValue("string", "app_name", "MS Image")
-        }
-        create("full") {
-            dimension = "app"
-            applicationId = "com.mssmarttools.app"
-            resValue("string", "app_name", "MS Smart Tools")
-        }
+        resValue("string", "app_name", "MS Image")
     }
 
     signingConfigs {

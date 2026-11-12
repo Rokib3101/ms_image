@@ -22,6 +22,8 @@
 .pub-cache/
 .pub/
 build/
+/*.apk
+assets/*.apk
 
 # Android generated files & Gradle caches
 .gradle/
